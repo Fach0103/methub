@@ -1,0 +1,4 @@
+/* css/placeholder.css */
+.placeholder-view { padding: 96px 0; max-width: 60ch; }
+.placeholder-view h1 { font-size: 2rem; margin-bottom: 12px; }
+.placeholder-view__desc { color: var(--color-ink-soft); font-size: 1rem; }

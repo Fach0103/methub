@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetHub — Explorador de la colección del Met</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- CSS separado por responsabilidad -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="css/stats.css" />
+  <link rel="stylesheet" href="css/gallery.css" />
+  <link rel="stylesheet" href="css/states.css" />
+  <link rel="stylesheet" href="css/placeholder.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+</head>
+<body>
+  <nav-bar></nav-bar>
+  <main id="app-main" class="app-main"></main>
+  <footer class="site-footer">
+    <p class="site-footer__credits">Hecho por <strong>[Integrante A]</strong> y <strong>[Integrante B]</strong> · 2026</p>
+    <p class="site-footer__source">Datos provistos por la Open Access API del Metropolitan Museum of Art. Esta aplicación no está afiliada al museo.</p>
+  </footer>
+
+  <!-- Core: orden estricto, cada clase depende de la anterior -->
+  <script src="js/core/ApiClient.js"></script>
+  <script src="js/core/MetService.js"></script>
+  <script src="js/core/Router.js"></script>
+  <script src="js/core/View.js"></script>
+
+  <!-- Componentes (Custom Elements), independientes entre sí -->
+  <script src="js/components/NavBar.js"></script>
+  <script src="js/components/LoadingState.js"></script>
+  <script src="js/components/ErrorState.js"></script>
+
+  <!-- Vistas: todas extienden View, deben cargarse después de core/View.js -->
+  <script src="js/views/HomeView.js"></script>
+  <script src="js/views/ExploreView.js"></script>
+  <script src="js/views/DetailView.js"></script>
+  <script src="js/views/DepartmentsView.js"></script>
+  <script src="js/views/ArtistView.js"></script>
+  <script src="js/views/CompareView.js"></script>
+
+  <!-- Bootstrap: siempre al final -->
+  <script src="js/App.js"></script>
+</body>
+</html>
