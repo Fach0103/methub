@@ -1,4 +1,6 @@
-/* js/components/NavBar.js */
+/**
+ * <nav-bar> — Barra de navegación global (sección 3.1).
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -37,10 +39,11 @@ class NavBar extends HTMLElement {
   }
 
   updateActive() {
-    const current = (window.location.hash.slice(1) || 'home').split('/')[0];
+    const current = (window.location.hash.slice(1) || 'home').split('/')[0].split('?')[0];
     this.querySelectorAll('a[data-path]').forEach((a) => {
       a.classList.toggle('is-active', a.dataset.path === current);
     });
   }
 }
+
 customElements.define('nav-bar', NavBar);

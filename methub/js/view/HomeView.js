@@ -98,7 +98,7 @@ class HomeView extends View {
 
   /**
    * Tarjeta de obra reutilizable — static porque no depende de estado de
-   * instancia. Úsala igual en ExploreView y ArtistView.
+   * instancia. Se reutiliza en ExploreView y ArtistView.
    */
   static buildWorkCard(obra, router) {
     const card = document.createElement('article');
@@ -137,7 +137,10 @@ class HomeView extends View {
     const goToDetail = () => router.navigate(`detail/${obra.objectID}`);
     card.addEventListener('click', goToDetail);
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        goToDetail();
+      }
     });
 
     return card;

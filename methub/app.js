@@ -1,8 +1,8 @@
 /**
  * App — construye las dependencias UNA vez (ApiClient, MetService) y se
- * las inyecta a cada View. Controla el ciclo de vida: cuando cambia la
- * ruta, desmonta la vista anterior (cancela sus peticiones pendientes)
- * antes de montar la nueva.
+ * las inyecta a cada View. Controla el ciclo de vida: al cambiar de ruta,
+ * desmonta la vista anterior (cancela sus peticiones pendientes) antes de
+ * montar la nueva.
  */
 class App {
   constructor() {
@@ -32,30 +32,29 @@ class App {
 
   _registerRoutes() {
     this.router
-      .register('home', () => this._activate(this.views.home))
-      .register('explore', (p) => this._activate(this.views.explore, p))
-      .register('departments', () => this._activate(this.views.departments))
-      .register('detail/:id', (p) => this._activate(this.views.detail, p))
-      .register('artist/:name', (p) => this._activate(this.views.artist, p))
-      .register('compare', (p) => this._activate(this.views.compare, p))
+      .register('home', (p, q) => this._activate(this.views.home, p, q))
+      .register('explore', (p, q) => this._activate(this.views.explore, p, q))
+      .register('departments', (p, q) => this._activate(this.views.departments, p, q))
+      .register('detail/:id', (p, q) => this._activate(this.views.detail, p, q))
+      .register('artist/:name', (p, q) => this._activate(this.views.artist, p, q))
+      .register('compare', (p, q) => this._activate(this.views.compare, p, q))
       .notFound((path) => this._notFound(path));
   }
 
-  _activate(view, params = {}) {
+  _activate(view, params = {}, query = new URLSearchParams()) {
     if (this.currentView && this.currentView !== view) {
       this.currentView.unmount();
     }
     this.currentView = view;
-    view.mount(params);
+    view.mount(params, query);
   }
 
   _notFound(path) {
     if (this.currentView) this.currentView.unmount();
     this.container.innerHTML = '';
-    const p = document.createElement('p');
-    p.className = 'placeholder-view__desc';
-    p.textContent = `La ruta "#${path}" no existe. Volviendo al inicio…`;
-    this.container.appendChild(p);
+    this.container.appendChild(
+      this.views.home.buildPlaceholder('Página no encontrada', `La ruta "#${path}" no existe. Volviendo al inicio…`)
+    );
     setTimeout(() => this.router.navigate('home'), 1400);
   }
 
@@ -67,4 +66,5 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
   const app = new App();
   app.start();
+  window.methubApp = app; // útil para depurar desde la consola del navegador
 });

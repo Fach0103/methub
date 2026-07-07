@@ -1,6 +1,7 @@
 /**
- * Router de hash. register() acepta patrones con ':param'.
- * Los botones Atrás/Adelante del navegador funcionan solos (hashchange).
+ * Router de hash con soporte de :params de ruta y query params
+ * (ej. #explore?departmentId=11&page=2). Cada handler recibe (params, query)
+ * donde query es un URLSearchParams.
  */
 class Router {
   constructor() {
@@ -31,13 +32,15 @@ class Router {
     return this;
   }
 
-  currentPath() {
-    const hash = window.location.hash.slice(1);
-    return hash === '' ? 'home' : hash.replace(/^\//, '');
+  _parseHash() {
+    const raw = window.location.hash.slice(1);
+    const [pathPart, queryPart] = raw.split('?');
+    const path = !pathPart || pathPart === '/' ? 'home' : pathPart.replace(/^\//, '');
+    return { path, query: new URLSearchParams(queryPart || '') };
   }
 
   resolve() {
-    const path = this.currentPath();
+    const { path, query } = this._parseHash();
     for (const route of this.routes) {
       const match = path.match(route.regex);
       if (match) {
@@ -45,7 +48,7 @@ class Router {
         route.paramNames.forEach((name, i) => {
           params[name] = decodeURIComponent(match[i + 1]);
         });
-        route.handler(params);
+        route.handler(params, query);
         window.scrollTo(0, 0);
         return;
       }
@@ -53,8 +56,27 @@ class Router {
     if (this.notFoundHandler) this.notFoundHandler(path);
   }
 
-  navigate(path) {
-    window.location.hash = path;
+  /** navigate('explore', { departmentId: 11 })  |  navigate('detail/123') */
+  navigate(path, queryObj) {
+    let hash = path;
+    if (queryObj && Object.keys(queryObj).length > 0) {
+      const qs = new URLSearchParams(
+        Object.fromEntries(Object.entries(queryObj).filter(([, v]) => v !== undefined && v !== null && v !== ''))
+      ).toString();
+      if (qs) hash += `?${qs}`;
+    }
+    window.location.hash = hash;
+  }
+
+  /** Reemplaza el query string sin crear una entrada nueva en el historial. */
+  replaceQuery(path, queryObj) {
+    let hash = path;
+    const qs = new URLSearchParams(
+      Object.fromEntries(Object.entries(queryObj || {}).filter(([, v]) => v !== undefined && v !== null && v !== ''))
+    ).toString();
+    if (qs) hash += `?${qs}`;
+    history.replaceState(null, '', `#${hash}`);
+    this.resolve();
   }
 
   start() {

@@ -1,8 +1,7 @@
 /**
  * MetService — todo lo que la app sabe sobre la API del Met Museum.
  * Documentación oficial: https://metmuseum.github.io/
- * Recibe un ApiClient inyectado, no lo instancia (facilita testear o
- * reemplazar el cliente HTTP sin tocar esta clase).
+ * Recibe un ApiClient inyectado por constructor (no lo instancia).
  */
 class MetService {
   constructor(apiClient) {

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MetHub — Explorador de la colección del Met</title>
+  <meta name="description" content="Explora la colección abierta del Metropolitan Museum of Art." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,7 +13,7 @@
     rel="stylesheet"
   />
 
-  <!-- CSS separado por responsabilidad -->
+  <!-- CSS separado por responsabilidad; el orden importa: tokens y base primero -->
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/layout.css" />
@@ -23,13 +24,26 @@
   <link rel="stylesheet" href="css/states.css" />
   <link rel="stylesheet" href="css/placeholder.css" />
   <link rel="stylesheet" href="css/footer.css" />
+  <link rel="stylesheet" href="css/explore.css" />
+  <link rel="stylesheet" href="css/departments.css" />
+  <link rel="stylesheet" href="css/detail.css" />
+  <link rel="stylesheet" href="css/compare.css" />
 </head>
 <body>
   <nav-bar></nav-bar>
-  <main id="app-main" class="app-main"></main>
+
+  <main id="app-main" class="app-main">
+    <!-- App reemplaza este contenido dinámicamente según la ruta -->
+  </main>
+
   <footer class="site-footer">
-    <p class="site-footer__credits">Hecho por <strong>[Integrante A]</strong> y <strong>[Integrante B]</strong> · 2026</p>
-    <p class="site-footer__source">Datos provistos por la Open Access API del Metropolitan Museum of Art. Esta aplicación no está afiliada al museo.</p>
+    <p class="site-footer__credits">
+      Hecho por <strong>[Tu nombre]</strong> · 2026
+    </p>
+    <p class="site-footer__source">
+      Datos provistos por la Open Access API del Metropolitan Museum of Art.
+      Esta aplicación no está afiliada al museo.
+    </p>
   </footer>
 
   <!-- Core: orden estricto, cada clase depende de la anterior -->

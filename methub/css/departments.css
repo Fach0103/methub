@@ -1,0 +1,57 @@
+.departments-header {
+  padding-top: 48px;
+  margin-bottom: 32px;
+  max-width: 60ch;
+}
+.departments-header h1 { font-size: 2rem; margin-bottom: 10px; }
+.departments-header p { color: var(--color-ink-soft); margin: 0; }
+
+.departments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  padding-bottom: 48px;
+}
+
+.dept-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 22px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.dept-card:hover,
+.dept-card:focus-visible {
+  box-shadow: var(--shadow-card);
+  transform: translateY(-2px);
+}
+
+.dept-card__badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--color-accent-on-wall);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dept-card__name {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.dept-card__hint {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-accent-deep);
+  margin-top: auto;
+}

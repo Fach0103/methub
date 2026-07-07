@@ -1,6 +1,7 @@
 /**
  * ApiClient — cliente HTTP genérico. Timeout con AbortController y
  * cancelación externa (para cuando una vista se desmonta a mitad de carga).
+ * No sabe nada del Met Museum: es reutilizable para cualquier API REST.
  */
 class ApiClient {
   constructor({ baseURL, timeout = 10000 }) {
@@ -27,8 +28,6 @@ class ApiClient {
     } catch (err) {
       if (err.name === 'AbortError') {
         if (signal && signal.aborted) {
-          // La vista se desmontó antes de que la petición terminara.
-          // No es un error real: no hay que mostrar ErrorState por esto.
           const cancelled = new Error('Solicitud cancelada');
           cancelled.name = 'CancelledError';
           throw cancelled;

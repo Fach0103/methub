@@ -1,8 +1,8 @@
 /**
  * View — clase base abstracta para todas las vistas.
- * Contrato: cada subclase implementa render(params).
- * Ciclo de vida: App llama mount() al entrar a la ruta y unmount()
- * al salir — así cualquier fetch pendiente se cancela solo (ver ApiClient).
+ * Contrato: cada subclase implementa render(params, query).
+ * Ciclo de vida: App llama mount() al entrar a la ruta y unmount() al
+ * salir — así cualquier fetch pendiente se cancela solo (ver ApiClient).
  */
 class View {
   constructor({ container, services, router }) {
@@ -11,13 +11,15 @@ class View {
     this.router = router;
     this.abortController = null;
     this.params = {};
+    this.query = new URLSearchParams();
   }
 
-  mount(params = {}) {
+  mount(params = {}, query = new URLSearchParams()) {
     this.params = params;
+    this.query = query;
     this.abortController = new AbortController();
     this.container.innerHTML = '';
-    this.render(params);
+    this.render(params, query);
   }
 
   unmount() {
@@ -25,7 +27,7 @@ class View {
   }
 
   // Debe sobreescribirse en cada subclase.
-  render(_params) {
+  render(_params, _query) {
     throw new Error(`${this.constructor.name} no implementó render()`);
   }
 
