@@ -1,0 +1,19 @@
+.artist-header {
+  margin-bottom: 32px;
+  max-width: 70ch;
+}
+.artist-header h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+.artist-header__bio {
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  margin: 0 0 8px;
+}
+.artist-header__count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-accent-deep);
+  margin: 0;
+}

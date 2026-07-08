@@ -1,3 +1,8 @@
-/* css/footer.css */
-.site-footer { border-top: 1px solid var(--color-line); padding: 28px 24px 40px; text-align: center; font-size: .82rem; color: var(--color-ink-soft); }
+.site-footer {
+  border-top: 1px solid var(--color-line);
+  padding: 28px 24px 40px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+}
 .site-footer p { margin: 4px 0; }

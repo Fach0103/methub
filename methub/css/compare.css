@@ -29,6 +29,7 @@
   margin: 0 0 14px;
 }
 
+/* --- Buscador interno --- */
 .compare-search input[type="search"] {
   width: 100%;
   font-family: var(--font-body);
@@ -90,6 +91,7 @@
   text-overflow: ellipsis;
 }
 
+/* --- Obra seleccionada --- */
 .compare-selected { text-align: center; }
 .compare-selected__image {
   aspect-ratio: 4 / 3;
@@ -111,6 +113,7 @@
 .compare-selected__artist { color: var(--color-ink-soft); font-size: 0.88rem; margin: 0 0 16px; }
 .compare-selected .btn--ghost-neutral { width: auto; padding: 8px 18px; }
 
+/* --- Tabla comparativa --- */
 .compare-table-section { padding-bottom: 64px; }
 .compare-table {
   width: 100%;

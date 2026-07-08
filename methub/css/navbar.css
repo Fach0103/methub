@@ -1,4 +1,3 @@
-/* css/navbar.css */
 nav-bar {
   display: block;
   position: sticky;
@@ -20,21 +19,31 @@ nav-bar {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.35rem;
+  letter-spacing: 0.01em;
   color: var(--color-accent-on-wall);
 }
-.navbar__links { list-style: none; display: flex; gap: 28px; margin: 0; padding: 0; }
+.navbar__links {
+  list-style: none;
+  display: flex;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+}
 .navbar__links a {
-  font-size: .92rem;
+  font-size: 0.92rem;
   font-weight: 500;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: rgba(217,200,154,.72);
+  color: rgba(217, 200, 154, 0.72);
   padding-bottom: 4px;
   border-bottom: 1px solid transparent;
-  transition: color .15s ease, border-color .15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 .navbar__links a:hover { color: var(--color-accent-on-wall); }
-.navbar__links a.is-active { color: var(--color-accent-on-wall); border-bottom-color: var(--color-accent-on-wall); }
+.navbar__links a.is-active {
+  color: var(--color-accent-on-wall);
+  border-bottom-color: var(--color-accent-on-wall);
+}
 
 @media (max-width: 640px) {
   .navbar__inner { flex-wrap: wrap; gap: 12px; }
