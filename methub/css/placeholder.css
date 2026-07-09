@@ -1,12 +1,12 @@
 .placeholder-view {
-  padding: 96px 0;
+  padding: 24px 4px;
   max-width: 60ch;
 }
 .placeholder-view h1 {
-  font-size: 2rem;
-  margin-bottom: 12px;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
 }
 .placeholder-view__desc {
-  color: var(--color-ink-soft);
-  font-size: 1rem;
+  font-size: 0.9rem;
+  color: #444;
 }

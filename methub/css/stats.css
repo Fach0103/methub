@@ -1,25 +1,21 @@
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 56px;
+/**
+ * stats.css — Estadísticas de #home, dentro de un fieldset (GroupBox de 7.css).
+ */
+.stats-groupbox {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
 }
-.stat-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
-  padding: 22px 24px;
+.stat-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
 }
-.stat-card__value {
-  font-family: var(--font-mono);
-  font-size: 2rem;
-  font-weight: 500;
-  color: var(--color-accent-deep);
+.stat-block__value {
+  font-size: 1.6rem;
+  font-weight: 700;
 }
-.stat-card__label {
-  font-size: 0.85rem;
-  color: var(--color-ink-soft);
+.stat-block__label {
+  font-size: 0.78rem;
+  color: #555;
 }

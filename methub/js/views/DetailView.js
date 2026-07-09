@@ -1,5 +1,8 @@
 /**
  * DetailView — V-03 Detalle de Obra (#detail/:id). Sección 4.3.
+ * Reskin Windows 7: la ficha se muestra dentro de una ventana anidada con
+ * pestañas ("General" / "Etiquetas"), al estilo de un diálogo de
+ * Propiedades de archivo.
  */
 class DetailView extends View {
   render(params) {
@@ -41,7 +44,7 @@ class DetailView extends View {
   _buildBackButton() {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'btn btn--ghost-neutral detail-back';
+    btn.className = 'detail-back';
     btn.textContent = '← Volver';
     btn.addEventListener('click', () => window.history.back());
     return btn;
@@ -50,15 +53,11 @@ class DetailView extends View {
   _renderObra(obra) {
     this.container.innerHTML = '';
     this.container.appendChild(this._buildBackButton());
-
-    const layout = document.createElement('div');
-    layout.className = 'detail-layout';
-    layout.appendChild(this._buildImageColumn(obra));
-    layout.appendChild(this._buildInfoColumn(obra));
-    this.container.appendChild(layout);
+    this.container.appendChild(this._buildImageColumn(obra));
+    this.container.appendChild(this._buildPropertiesWindow(obra));
   }
 
-  // --- Columna izquierda: imagen (4.3.2) ---
+  // --- Imagen (4.3.2) ---
   _buildImageColumn(obra) {
     const col = document.createElement('div');
     col.className = 'detail-image-col';
@@ -82,15 +81,18 @@ class DetailView extends View {
     const additional = (obra.additionalImages || []).slice(0, 8);
     if (additional.length > 0) {
       const thumbs = document.createElement('div');
-      thumbs.className = 'detail-thumbs';
+      thumbs.className = 'icon-grid detail-thumbs';
       additional.forEach((src) => {
         const thumbBtn = document.createElement('button');
         thumbBtn.type = 'button';
-        thumbBtn.className = 'detail-thumbs__item';
+        thumbBtn.className = 'icon-tile detail-thumbs__item';
+        const thumbWrap = document.createElement('div');
+        thumbWrap.className = 'icon-tile__thumb';
         const img = document.createElement('img');
         img.src = src;
         img.alt = 'Imagen adicional de la obra';
-        thumbBtn.appendChild(img);
+        thumbWrap.appendChild(img);
+        thumbBtn.appendChild(thumbWrap);
         thumbBtn.addEventListener('click', () => {
           if (mainImg) mainImg.src = src;
         });
@@ -102,17 +104,24 @@ class DetailView extends View {
     return col;
   }
 
-  // --- Columna derecha: ficha técnica (4.3.2) ---
-  _buildInfoColumn(obra) {
-    const col = document.createElement('div');
-    col.className = 'detail-info-col';
+  // --- "Ventana de propiedades" con pestañas (4.3.2 + 4.3.3) ---
+  _buildPropertiesWindow(obra) {
+    const win = document.createElement('div');
+    win.className = 'window active detail-props-window';
+
+    const titleBar = document.createElement('div');
+    titleBar.className = 'title-bar';
+    const titleText = document.createElement('div');
+    titleText.className = 'title-bar-text';
+    titleText.textContent = `Propiedades de "${obra.title || 'Sin título'}"`;
+    titleBar.appendChild(titleText);
+    win.appendChild(titleBar);
+
+    const body = document.createElement('div');
+    body.className = 'window-body has-space';
 
     const header = document.createElement('div');
     header.className = 'detail-header';
-    const title = document.createElement('h1');
-    title.textContent = obra.title || 'Sin título';
-    header.appendChild(title);
-
     if (obra.artistDisplayName) {
       const artistLink = document.createElement('a');
       artistLink.href = '#';
@@ -129,49 +138,61 @@ class DetailView extends View {
       noArtist.textContent = 'Artista desconocido';
       header.appendChild(noArtist);
     }
-    col.appendChild(header);
-
     if (obra.artistDisplayBio) {
       const bio = document.createElement('p');
       bio.className = 'detail-bio';
       bio.textContent = obra.artistDisplayBio;
-      col.appendChild(bio);
+      header.appendChild(bio);
+    }
+    body.appendChild(header);
+
+    body.appendChild(this._buildTabs(obra));
+    body.appendChild(this._buildActions(obra));
+
+    win.appendChild(body);
+    return win;
+  }
+
+  _buildTabs(obra) {
+    const section = document.createElement('section');
+    section.className = 'tabs';
+
+    const tablist = document.createElement('menu');
+    tablist.setAttribute('role', 'tablist');
+    tablist.setAttribute('aria-label', 'Detalle de la obra');
+
+    const generalBtn = document.createElement('button');
+    generalBtn.setAttribute('role', 'tab');
+    generalBtn.setAttribute('aria-controls', 'tab-general');
+    generalBtn.setAttribute('aria-selected', 'true');
+    generalBtn.textContent = 'General';
+
+    const tagsBtn = document.createElement('button');
+    tagsBtn.setAttribute('role', 'tab');
+    tagsBtn.setAttribute('aria-controls', 'tab-tags');
+    tagsBtn.textContent = 'Etiquetas';
+
+    tablist.append(generalBtn, tagsBtn);
+    section.appendChild(tablist);
+
+    const generalPanel = document.createElement('article');
+    generalPanel.setAttribute('role', 'tabpanel');
+    generalPanel.id = 'tab-general';
+    generalPanel.appendChild(this._buildFieldsTable(obra));
+    if (obra.objectURL) {
+      const link = document.createElement('a');
+      link.href = obra.objectURL;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'detail-external-link';
+      link.textContent = 'Ver en el sitio del Met →';
+      generalPanel.appendChild(link);
     }
 
-    // Campos obligatorios: siempre visibles, con "—" si vienen vacíos (RNF-05)
-    const requiredRows = [
-      ['Fecha', obra.objectDate],
-      ['Técnica', obra.medium],
-      ['Dimensiones', obra.dimensions],
-      ['Departamento', obra.department],
-    ];
-    // Campos opcionales: solo se muestran si la API los trae
-    const optionalRows = [
-      ['Cultura', obra.culture],
-      ['Periodo', obra.period],
-      ['Clasificación', obra.classification],
-      ['Adquisición', obra.creditLine],
-    ];
-
-    const fieldsList = document.createElement('dl');
-    fieldsList.className = 'detail-fields';
-    requiredRows.forEach(([label, value]) => {
-      const dt = document.createElement('dt');
-      dt.textContent = label;
-      const dd = document.createElement('dd');
-      dd.textContent = value || '—';
-      fieldsList.append(dt, dd);
-    });
-    optionalRows.forEach(([label, value]) => {
-      if (!value) return;
-      const dt = document.createElement('dt');
-      dt.textContent = label;
-      const dd = document.createElement('dd');
-      dd.textContent = value;
-      fieldsList.append(dt, dd);
-    });
-    col.appendChild(fieldsList);
-
+    const tagsPanel = document.createElement('article');
+    tagsPanel.setAttribute('role', 'tabpanel');
+    tagsPanel.id = 'tab-tags';
+    tagsPanel.hidden = true;
     if (obra.tags && obra.tags.length > 0) {
       const tagsWrap = document.createElement('div');
       tagsWrap.className = 'detail-tags';
@@ -182,33 +203,78 @@ class DetailView extends View {
         chip.textContent = tag.term;
         tagsWrap.appendChild(chip);
       });
-      col.appendChild(tagsWrap);
+      tagsPanel.appendChild(tagsWrap);
+    } else {
+      const empty = document.createElement('p');
+      empty.className = 'note';
+      empty.textContent = 'Esta obra no tiene etiquetas asociadas.';
+      tagsPanel.appendChild(empty);
     }
 
-    if (obra.objectURL) {
-      const link = document.createElement('a');
-      link.href = obra.objectURL;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.className = 'detail-external-link';
-      link.textContent = 'Ver en el sitio del Met →';
-      col.appendChild(link);
-    }
+    section.append(generalPanel, tagsPanel);
 
-    col.appendChild(this._buildActions(obra));
+    const switchTab = (activeBtn, activePanel, inactiveBtn, inactivePanel) => {
+      activeBtn.setAttribute('aria-selected', 'true');
+      inactiveBtn.setAttribute('aria-selected', 'false');
+      activePanel.hidden = false;
+      inactivePanel.hidden = true;
+    };
+    generalBtn.addEventListener('click', () => switchTab(generalBtn, generalPanel, tagsBtn, tagsPanel));
+    tagsBtn.addEventListener('click', () => switchTab(tagsBtn, tagsPanel, generalBtn, generalPanel));
 
-    return col;
+    return section;
   }
 
-  // --- Acciones (4.3.3) ---
+  _buildFieldsTable(obra) {
+    const requiredRows = [
+      ['Fecha', obra.objectDate],
+      ['Técnica', obra.medium],
+      ['Dimensiones', obra.dimensions],
+      ['Departamento', obra.department],
+    ];
+    const optionalRows = [
+      ['Cultura', obra.culture],
+      ['Periodo', obra.period],
+      ['Clasificación', obra.classification],
+      ['Adquisición', obra.creditLine],
+    ];
+
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
+
+    requiredRows.forEach(([label, value]) => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.textContent = label;
+      th.style.textAlign = 'left';
+      const td = document.createElement('td');
+      td.textContent = value || '—';
+      tr.append(th, td);
+      tbody.appendChild(tr);
+    });
+    optionalRows.forEach(([label, value]) => {
+      if (!value) return;
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.textContent = label;
+      th.style.textAlign = 'left';
+      const td = document.createElement('td');
+      td.textContent = value;
+      tr.append(th, td);
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    return table;
+  }
+
   _buildActions(obra) {
-    const actions = document.createElement('div');
+    const actions = document.createElement('section');
     actions.className = 'detail-actions';
 
     if (obra.artistDisplayName) {
       const artistBtn = document.createElement('button');
       artistBtn.type = 'button';
-      artistBtn.className = 'btn btn--ghost-neutral';
       artistBtn.textContent = 'Ver más obras del artista';
       artistBtn.addEventListener('click', () => {
         this.router.navigate(`artist/${encodeURIComponent(obra.artistDisplayName)}`);
@@ -218,7 +284,7 @@ class DetailView extends View {
 
     const compareBtn = document.createElement('button');
     compareBtn.type = 'button';
-    compareBtn.className = 'btn';
+    compareBtn.className = 'default';
     compareBtn.textContent = 'Comparar';
     compareBtn.addEventListener('click', () => {
       this.router.navigate('compare', { a: obra.objectID });

@@ -2,9 +2,19 @@
  * App — construye las dependencias UNA vez (ApiClient, MetService) y se
  * las inyecta a cada View. Controla el ciclo de vida: al cambiar de ruta,
  * desmonta la vista anterior (cancela sus peticiones pendientes) antes de
- * montar la nueva.
+ * montar la nueva. También mantiene sincronizada la barra de título de la
+ * "ventana" Windows 7 con la vista activa.
  */
 class App {
+  static ROUTE_LABELS = {
+    home: 'Página Principal',
+    explore: 'Explorar',
+    departments: 'Departamentos',
+    detail: 'Detalle de Obra',
+    artist: 'Obras del Artista',
+    compare: 'Comparador',
+  };
+
   constructor() {
     const apiClient = new ApiClient({
       baseURL: 'https://collectionapi.metmuseum.org/public/collection/v1',
@@ -15,6 +25,7 @@ class App {
     this.container = document.getElementById('app-main');
     this.router = new Router();
     this.currentView = null;
+    this.currentRouteKey = 'home';
 
     const deps = { container: this.container, services: { metService }, router: this.router };
 
@@ -28,25 +39,59 @@ class App {
     };
 
     this._registerRoutes();
+    this._wireWindowControls();
   }
 
   _registerRoutes() {
     this.router
-      .register('home', (p, q) => this._activate(this.views.home, p, q))
-      .register('explore', (p, q) => this._activate(this.views.explore, p, q))
-      .register('departments', (p, q) => this._activate(this.views.departments, p, q))
-      .register('detail/:id', (p, q) => this._activate(this.views.detail, p, q))
-      .register('artist/:name', (p, q) => this._activate(this.views.artist, p, q))
-      .register('compare', (p, q) => this._activate(this.views.compare, p, q))
+      .register('home', (p, q) => this._activate('home', this.views.home, p, q))
+      .register('explore', (p, q) => this._activate('explore', this.views.explore, p, q))
+      .register('departments', (p, q) => this._activate('departments', this.views.departments, p, q))
+      .register('detail/:id', (p, q) => this._activate('detail', this.views.detail, p, q))
+      .register('artist/:name', (p, q) => this._activate('artist', this.views.artist, p, q))
+      .register('compare', (p, q) => this._activate('compare', this.views.compare, p, q))
       .notFound((path) => this._notFound(path));
   }
 
-  _activate(view, params = {}, query = new URLSearchParams()) {
+  _activate(routeKey, view, params = {}, query = new URLSearchParams()) {
     if (this.currentView && this.currentView !== view) {
       this.currentView.unmount();
     }
     this.currentView = view;
+    this.currentRouteKey = routeKey;
     view.mount(params, query);
+    this._updateTitleBar(routeKey);
+    this._restoreWindowState();
+  }
+
+  _updateTitleBar(routeKey) {
+    const titleEl = document.getElementById('win7-title-text');
+    if (!titleEl) return;
+    const label = App.ROUTE_LABELS[routeKey] || 'MetHub';
+    titleEl.textContent = `MetHub — ${label}`;
+  }
+
+  /** Los controles de la barra de título son decorativos + un par de gestos útiles. */
+  _wireWindowControls() {
+    const win = document.getElementById('win7-window');
+    const closeBtn = document.getElementById('win7-btn-close');
+    const minimizeBtn = document.getElementById('win7-btn-minimize');
+    const maximizeBtn = document.getElementById('win7-btn-maximize');
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.router.navigate('home'));
+    }
+    if (minimizeBtn) {
+      minimizeBtn.addEventListener('click', () => win.classList.toggle('is-minimized'));
+    }
+    if (maximizeBtn) {
+      maximizeBtn.addEventListener('click', () => win.classList.toggle('is-maximized'));
+    }
+  }
+
+  _restoreWindowState() {
+    const win = document.getElementById('win7-window');
+    if (win) win.classList.remove('is-minimized');
   }
 
   _notFound(path) {
@@ -55,6 +100,7 @@ class App {
     this.container.appendChild(
       this.views.home.buildPlaceholder('Página no encontrada', `La ruta "#${path}" no existe. Volviendo al inicio…`)
     );
+    this._updateTitleBar('home');
     setTimeout(() => this.router.navigate('home'), 1400);
   }
 

@@ -6,46 +6,54 @@
   <title>MetHub — Explorador de la colección del Met</title>
   <meta name="description" content="Explora la colección abierta del Metropolitan Museum of Art." />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
-  />
+  <!-- 7.css: recreación fiel de la UI de Windows 7. Ver https://khang-nd.github.io/7.css/ -->
+  <link rel="stylesheet" href="https://unpkg.com/7.css" />
 
-  <!-- CSS separado por responsabilidad; el orden importa: tokens y base primero -->
+  <!-- Nuestros estilos: complementan a 7.css, nunca pelean con sus controles nativos -->
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/navbar.css" />
-  <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="css/icon-view.css" />
   <link rel="stylesheet" href="css/stats.css" />
-  <link rel="stylesheet" href="css/gallery.css" />
   <link rel="stylesheet" href="css/states.css" />
   <link rel="stylesheet" href="css/placeholder.css" />
-  <link rel="stylesheet" href="css/footer.css" />
   <link rel="stylesheet" href="css/explore.css" />
   <link rel="stylesheet" href="css/departments.css" />
   <link rel="stylesheet" href="css/detail.css" />
   <link rel="stylesheet" href="css/compare.css" />
   <link rel="stylesheet" href="css/artist.css" />
 </head>
-<body>
+<body class="win7-desktop">
+
+  <!-- Ventana única: todo el contenido de la SPA vive aquí. La barra de título
+       y la barra de estado son persistentes; solo #app-main cambia por ruta. -->
+  <div class="window glass active win7-window" id="win7-window">
+    <div class="title-bar" id="win7-titlebar">
+      <div class="title-bar-text" id="win7-title-text">MetHub — Página Principal</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" id="win7-btn-minimize"></button>
+        <button aria-label="Maximize" id="win7-btn-maximize"></button>
+        <button aria-label="Close" id="win7-btn-close" title="Volver al inicio"></button>
+      </div>
+    </div>
+
+    <div class="window-body has-space win7-window-body" id="win7-window-body">
+      <main id="app-main" class="app-main">
+        <!-- App reemplaza este contenido dinámicamente según la ruta -->
+      </main>
+    </div>
+
+    <!-- Barra de estado: cumple el rol del footer (créditos + fuente de datos),
+         siempre visible sin importar la vista (sección 3.2 del documento). -->
+    <div class="status-bar">
+      <p class="status-bar-field">Hecho por [Tu nombre] · 2026</p>
+      <p class="status-bar-field">Datos: Open Access API del Metropolitan Museum of Art</p>
+      <p class="status-bar-field">No afiliado al museo</p>
+    </div>
+  </div>
+
   <nav-bar></nav-bar>
-
-  <main id="app-main" class="app-main">
-    <!-- App reemplaza este contenido dinámicamente según la ruta -->
-  </main>
-
-  <footer class="site-footer">
-    <p class="site-footer__credits">
-      Hecho por <strong>[Tu nombre]</strong> · 2026
-    </p>
-    <p class="site-footer__source">
-      Datos provistos por la Open Access API del Metropolitan Museum of Art.
-      Esta aplicación no está afiliada al museo.
-    </p>
-  </footer>
 
   <!-- Core: orden estricto, cada clase depende de la anterior -->
   <script src="js/core/ApiClient.js"></script>

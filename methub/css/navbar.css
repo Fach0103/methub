@@ -1,51 +1,92 @@
+/**
+ * navbar.css — Estilos de la taskbar (antes navbar). El elemento
+ * <nav-bar> se posiciona fijo abajo, imitando la barra de tareas de
+ * Windows 7.
+ */
 nav-bar {
   display: block;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--color-wall);
-  border-bottom: 1px solid var(--color-accent-deep);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--taskbar-height);
+  z-index: 100;
+  background: linear-gradient(to bottom, #3a5f8a 0%, #1c3a5e 8%, #0f2743 100%);
+  border-top: 1px solid #7fb1e6;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.35);
 }
-.navbar__inner {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 16px 24px;
+
+.taskbar {
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+.taskbar__start {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 8px;
+  padding: 0 14px 0 10px;
+  text-decoration: none;
+  background: linear-gradient(to bottom, #4f9e3f 0%, #2c6e1f 50%, #1f5314 100%);
+  border-right: 1px solid #0f2743;
 }
-.navbar__logo {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.35rem;
-  letter-spacing: 0.01em;
-  color: var(--color-accent-on-wall);
-}
-.navbar__links {
-  list-style: none;
+.taskbar__start:hover { filter: brightness(1.1); }
+.taskbar__orb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #eafce0, #6fbf4f 55%, #2c6e1f 100%);
+  color: #1f3a12;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 0.8rem;
   display: flex;
-  gap: 28px;
-  margin: 0;
-  padding: 0;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
 }
-.navbar__links a {
-  font-size: 0.92rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: rgba(217, 200, 154, 0.72);
-  padding-bottom: 4px;
-  border-bottom: 1px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
+.taskbar__start-label {
+  color: #f2f8ee;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
-.navbar__links a:hover { color: var(--color-accent-on-wall); }
-.navbar__links a.is-active {
-  color: var(--color-accent-on-wall);
-  border-bottom-color: var(--color-accent-on-wall);
+
+.taskbar__divider {
+  width: 1px;
+  margin: 6px 4px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.taskbar__pinned {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 4px 6px;
+}
+
+.taskbar__button {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  color: #e7f0fb;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+.taskbar__button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.taskbar__button.is-active {
+  background: linear-gradient(to bottom, rgba(120, 172, 232, 0.55), rgba(61, 111, 180, 0.55));
+  border-color: var(--accent-glow);
+  box-shadow: inset 0 0 6px rgba(150, 200, 255, 0.6);
 }
 
 @media (max-width: 640px) {
-  .navbar__inner { flex-wrap: wrap; gap: 12px; }
-  .navbar__links { gap: 18px; }
+  .taskbar__start-label { display: none; }
+  .taskbar__button { padding: 0 10px; font-size: 0.75rem; }
 }

@@ -1,14 +1,16 @@
 /**
  * ExploreView — V-02 Explorar (#explore). Sección 4.2.
- * Flujo: cambia un filtro -> _runSearch() (nuevo search, page=1) ->
- * _loadPage() (resuelve los 12 IDs de la página actual y recalcula agregados).
+ * Reskin Windows 7: filtros y agregados como GroupBox (fieldset), galería
+ * como vista de íconos, paginación como mini barra de estado.
+ * La lógica (búsqueda, paginación, agregados, preservación de estado al
+ * volver) es idéntica a la versión anterior — solo cambia el marcado/CSS.
  */
 class ExploreView extends View {
   constructor(deps) {
     super(deps);
     this.PAGE_SIZE = 12;
     this._resetState();
-    this.departments = null; // cache: se piden una sola vez
+    this.departments = null;
     this._initialized = false;
     this._lastDepartmentIdFromQuery = '';
   }
@@ -29,10 +31,6 @@ class ExploreView extends View {
 
   render(_params, query) {
     const incomingDept = query.get('departmentId') || '';
-    // Solo reiniciamos el estado si es la primera vez que se monta esta vista,
-    // o si llega un departmentId distinto al que ya teníamos aplicado (ej. el
-    // usuario hizo clic en otro departamento). Si es simplemente "Volver" desde
-    // #detail hacia la misma ruta #explore, conservamos filtros y página (4.3.3).
     const isFreshEntry = !this._initialized || incomingDept !== this._lastDepartmentIdFromQuery;
     if (isFreshEntry) {
       this._resetState();
@@ -44,28 +42,27 @@ class ExploreView extends View {
     const layout = document.createElement('div');
     layout.className = 'explore-layout';
 
-    this.filterPanelEl = document.createElement('aside');
-    this.filterPanelEl.className = 'filter-panel';
-    this.filterPanelEl.appendChild(this._buildPanelSkeleton());
+    this.filterFieldset = document.createElement('fieldset');
+    this.filterFieldset.className = 'explore-filters';
+    this.filterFieldset.appendChild(this._buildPanelSkeleton());
 
-    this.aggregatesEl = document.createElement('aside');
-    this.aggregatesEl.className = 'aggregates-panel';
+    this.aggregatesFieldset = document.createElement('fieldset');
+    this.aggregatesFieldset.className = 'explore-aggregates';
 
-    this.gallerySection = document.createElement('section');
-    this.gallerySection.className = 'gallery-section';
+    const gallerySection = document.createElement('section');
     const h1 = document.createElement('h1');
     h1.textContent = 'Explorar la colección';
-    this.gallerySection.appendChild(h1);
+    gallerySection.appendChild(h1);
 
     this.galleryGrid = document.createElement('div');
-    this.galleryGrid.className = 'gallery-grid';
-    this.gallerySection.appendChild(this.galleryGrid);
+    this.galleryGrid.className = 'icon-grid';
+    gallerySection.appendChild(this.galleryGrid);
 
     this.paginationEl = document.createElement('div');
-    this.paginationEl.className = 'pagination';
-    this.gallerySection.appendChild(this.paginationEl);
+    this.paginationEl.className = 'status-bar explore-pagination';
+    gallerySection.appendChild(this.paginationEl);
 
-    layout.append(this.filterPanelEl, this.gallerySection, this.aggregatesEl);
+    layout.append(this.filterFieldset, gallerySection, this.aggregatesFieldset);
     this.container.appendChild(layout);
 
     this._loadDepartmentsIntoFilter();
@@ -73,8 +70,6 @@ class ExploreView extends View {
     if (isFreshEntry || this.objectIDs.length === 0) {
       this._runSearch();
     } else {
-      // Estado conservado: reutilizamos objectIDs/total ya obtenidos y solo
-      // volvemos a resolver la página en la que el usuario se había quedado.
       this._loadPage();
     }
   }
@@ -84,19 +79,22 @@ class ExploreView extends View {
   _buildPanelSkeleton() {
     const wrap = document.createDocumentFragment();
 
-    const h2 = document.createElement('h2');
-    h2.textContent = 'Filtros';
-    wrap.appendChild(h2);
+    const legend = document.createElement('legend');
+    legend.textContent = 'Filtros';
+    wrap.appendChild(legend);
 
+    const searchGroup = document.createElement('div');
+    searchGroup.className = 'group';
     const searchLabel = document.createElement('label');
-    searchLabel.className = 'field';
+    searchLabel.htmlFor = 'explore-search-input';
     searchLabel.textContent = 'Buscar';
     this.searchInput = document.createElement('input');
     this.searchInput.type = 'search';
+    this.searchInput.id = 'explore-search-input';
     this.searchInput.placeholder = 'Título, artista, tema…';
     this.searchInput.value = this.filters.q;
-    searchLabel.appendChild(this.searchInput);
-    wrap.appendChild(searchLabel);
+    searchGroup.append(searchLabel, this.searchInput);
+    wrap.appendChild(searchGroup);
 
     let debounceId;
     this.searchInput.addEventListener('input', () => {
@@ -107,32 +105,35 @@ class ExploreView extends View {
       }, 400);
     });
 
+    const deptGroup = document.createElement('div');
+    deptGroup.className = 'group';
     const deptLabel = document.createElement('label');
-    deptLabel.className = 'field';
+    deptLabel.htmlFor = 'explore-dept-select';
     deptLabel.textContent = 'Departamento';
     this.deptSelect = document.createElement('select');
+    this.deptSelect.id = 'explore-dept-select';
     this.deptSelect.innerHTML = '<option value="">Todos</option>';
     this.deptSelect.disabled = true;
-    deptLabel.appendChild(this.deptSelect);
-    wrap.appendChild(deptLabel);
+    deptGroup.append(deptLabel, this.deptSelect);
+    wrap.appendChild(deptGroup);
 
     this.deptSelect.addEventListener('change', () => {
       this.filters.departmentId = this.deptSelect.value;
       this._runSearch();
     });
 
-    const yearLabel = document.createElement('div');
-    yearLabel.className = 'field';
-    const yearTitle = document.createElement('span');
-    yearTitle.textContent = 'Rango de años';
-    yearLabel.appendChild(yearTitle);
+    const yearWrap = document.createElement('div');
+    yearWrap.className = 'group';
+    const yearLabel = document.createElement('label');
+    yearLabel.textContent = 'Rango de años';
+    yearWrap.appendChild(yearLabel);
 
     const yearDisplay = document.createElement('div');
     yearDisplay.className = 'year-range__display';
     this.yearBeginOut = document.createElement('span');
     this.yearEndOut = document.createElement('span');
     yearDisplay.append(this.yearBeginOut, document.createTextNode(' — '), this.yearEndOut);
-    yearLabel.appendChild(yearDisplay);
+    yearWrap.appendChild(yearDisplay);
 
     const currentYear = new Date().getFullYear();
     const MIN_YEAR = -3000;
@@ -151,8 +152,8 @@ class ExploreView extends View {
     const sliderWrap = document.createElement('div');
     sliderWrap.className = 'year-range__sliders';
     sliderWrap.append(this.yearBeginRange, this.yearEndRange);
-    yearLabel.appendChild(sliderWrap);
-    wrap.appendChild(yearLabel);
+    yearWrap.appendChild(sliderWrap);
+    wrap.appendChild(yearWrap);
 
     const formatYear = (y) => (y < 0 ? `${Math.abs(y)} a. C.` : `${y}`);
     this._updateYearDisplay = () => {
@@ -177,12 +178,14 @@ class ExploreView extends View {
     this.yearBeginRange.addEventListener('input', onYearChange);
     this.yearEndRange.addEventListener('input', onYearChange);
 
-    wrap.appendChild(this._buildCheckbox('Solo obras destacadas', 'isHighlight'));
-    wrap.appendChild(this._buildCheckbox('Solo con imagen', 'hasImages'));
+    const checkGroup = document.createElement('div');
+    checkGroup.className = 'group';
+    checkGroup.appendChild(this._buildCheckbox('Solo obras destacadas', 'isHighlight', 'explore-chk-highlight'));
+    checkGroup.appendChild(this._buildCheckbox('Solo con imagen', 'hasImages', 'explore-chk-images'));
+    wrap.appendChild(checkGroup);
 
     const clearBtn = document.createElement('button');
     clearBtn.type = 'button';
-    clearBtn.className = 'btn btn--ghost-neutral';
     clearBtn.textContent = 'Limpiar filtros';
     clearBtn.addEventListener('click', () => this._clearFilters());
     wrap.appendChild(clearBtn);
@@ -190,18 +193,21 @@ class ExploreView extends View {
     return wrap;
   }
 
-  _buildCheckbox(labelText, filterKey) {
-    const label = document.createElement('label');
-    label.className = 'field field--checkbox';
+  _buildCheckbox(labelText, filterKey, id) {
+    const div = document.createElement('div');
     const input = document.createElement('input');
     input.type = 'checkbox';
+    input.id = id;
     input.checked = this.filters[filterKey];
     input.addEventListener('change', () => {
       this.filters[filterKey] = input.checked;
       this._runSearch();
     });
-    label.append(input, document.createTextNode(labelText));
-    return label;
+    const label = document.createElement('label');
+    label.htmlFor = id;
+    label.textContent = labelText;
+    div.append(input, label);
+    return div;
   }
 
   async _loadDepartmentsIntoFilter() {
@@ -230,7 +236,7 @@ class ExploreView extends View {
     this.yearBeginRange.value = this.yearBeginRange.min;
     this.yearEndRange.value = this.yearEndRange.max;
     this._updateYearDisplay();
-    this.filterPanelEl.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
+    this.filterFieldset.querySelectorAll('input[type="checkbox"]').forEach((cb) => (cb.checked = false));
     this._runSearch();
   }
 
@@ -240,7 +246,7 @@ class ExploreView extends View {
     this.page = 1;
     this.galleryGrid.innerHTML = '';
     this.showLoading(this.galleryGrid, 'Buscando obras…');
-    this.showLoading(this.aggregatesEl, 'Calculando agregados…');
+    this._showAggregatesLoading();
     this.paginationEl.innerHTML = '';
 
     try {
@@ -259,7 +265,7 @@ class ExploreView extends View {
       if (objectIDs.length === 0) {
         this.galleryGrid.innerHTML = '';
         const msg = document.createElement('p');
-        msg.className = 'note';
+        msg.className = 'note icon-grid__note';
         msg.textContent = 'No se encontraron obras con los filtros aplicados.';
         this.galleryGrid.appendChild(msg);
         this._renderAggregates([], 0);
@@ -270,8 +276,16 @@ class ExploreView extends View {
     } catch (err) {
       if (this.isCancelled(err)) return;
       this.showError(this.galleryGrid, 'No se pudo completar la búsqueda.', () => this._runSearch());
-      this.aggregatesEl.innerHTML = '';
+      this.aggregatesFieldset.innerHTML = '';
     }
+  }
+
+  _showAggregatesLoading() {
+    this.aggregatesFieldset.innerHTML = '';
+    const legend = document.createElement('legend');
+    legend.textContent = 'Agregados';
+    this.aggregatesFieldset.appendChild(legend);
+    this.showLoading(this.aggregatesFieldset, 'Calculando…');
   }
 
   async _loadPage() {
@@ -280,7 +294,7 @@ class ExploreView extends View {
 
     this.galleryGrid.innerHTML = '';
     this.showLoading(this.galleryGrid, 'Cargando obras…');
-    this.showLoading(this.aggregatesEl, 'Calculando agregados…');
+    this._showAggregatesLoading();
 
     try {
       const { resolved, failures } = await this.services.metService.resolveIds(pageIds, { signal: this.signal });
@@ -292,13 +306,13 @@ class ExploreView extends View {
         return;
       }
 
-      resolved.forEach((obra) => this.galleryGrid.appendChild(HomeView.buildWorkCard(obra, this.router)));
+      resolved.forEach((obra) => this.galleryGrid.appendChild(HomeView.buildIconTile(obra, this.router)));
 
       if (failures > 0) {
         const note = document.createElement('p');
-        note.className = 'note';
+        note.className = 'note icon-grid__note';
         note.textContent = `${failures} obra(s) de esta página no se pudieron cargar y fueron omitidas.`;
-        this.galleryGrid.insertAdjacentElement('afterend', note);
+        this.galleryGrid.appendChild(note);
       }
 
       this._renderAggregates(resolved, this.total);
@@ -313,45 +327,49 @@ class ExploreView extends View {
     this.paginationEl.innerHTML = '';
     const totalPages = Math.max(1, Math.ceil(this.objectIDs.length / this.PAGE_SIZE));
 
+    const prevField = document.createElement('div');
+    prevField.className = 'status-bar-field';
     const prevBtn = document.createElement('button');
     prevBtn.type = 'button';
-    prevBtn.className = 'btn btn--ghost-neutral';
     prevBtn.textContent = '← Anterior';
     prevBtn.disabled = this.page <= 1;
     prevBtn.addEventListener('click', () => {
       this.page -= 1;
       this._loadPage();
     });
+    prevField.appendChild(prevBtn);
 
-    const info = document.createElement('span');
-    info.className = 'pagination__info';
-    info.textContent = `Página ${this.page} de ${totalPages}`;
+    const infoField = document.createElement('p');
+    infoField.className = 'status-bar-field';
+    infoField.textContent = `Página ${this.page} de ${totalPages}`;
 
+    const nextField = document.createElement('div');
+    nextField.className = 'status-bar-field';
     const nextBtn = document.createElement('button');
     nextBtn.type = 'button';
-    nextBtn.className = 'btn btn--ghost-neutral';
     nextBtn.textContent = 'Siguiente →';
     nextBtn.disabled = this.page >= totalPages;
     nextBtn.addEventListener('click', () => {
       this.page += 1;
       this._loadPage();
     });
+    nextField.appendChild(nextBtn);
 
-    this.paginationEl.append(prevBtn, info, nextBtn);
+    this.paginationEl.append(prevField, infoField, nextField);
   }
 
   // --- Panel de agregados en vivo (4.2.2) ---
 
   _renderAggregates(resolvedObras, total) {
-    this.aggregatesEl.innerHTML = '';
-    const h2 = document.createElement('h2');
-    h2.textContent = 'Agregados';
-    this.aggregatesEl.appendChild(h2);
+    this.aggregatesFieldset.innerHTML = '';
+    const legend = document.createElement('legend');
+    legend.textContent = 'Agregados';
+    this.aggregatesFieldset.appendChild(legend);
 
     const note = document.createElement('p');
-    note.className = 'aggregates-panel__note';
-    note.textContent = 'Agregados calculados sobre los visibles. Total se refiere al search completo.';
-    this.aggregatesEl.appendChild(note);
+    note.className = 'note';
+    note.textContent = 'Calculados sobre los visibles. El total es del search completo.';
+    this.aggregatesFieldset.appendChild(note);
 
     const rows =
       resolvedObras.length === 0
@@ -370,21 +388,22 @@ class ExploreView extends View {
             ['Cultura más frecuente', this._mode(resolvedObras, (o) => o.culture) || '—'],
           ];
 
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
     rows.forEach(([label, value]) => {
-      const row = document.createElement('div');
-      row.className = 'aggregate-row';
-      const l = document.createElement('span');
-      l.className = 'aggregate-row__label';
-      l.textContent = label;
-      const v = document.createElement('span');
-      v.className = 'aggregate-row__value';
-      v.textContent = value;
-      row.append(l, v);
-      this.aggregatesEl.appendChild(row);
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      th.textContent = label;
+      th.style.textAlign = 'left';
+      const td = document.createElement('td');
+      td.textContent = value;
+      tr.append(th, td);
+      tbody.appendChild(tr);
     });
+    table.appendChild(tbody);
+    this.aggregatesFieldset.appendChild(table);
   }
 
-  /** Moda (valor más frecuente) de un arreglo, ignorando vacíos/null. */
   _mode(items, keyFn) {
     const counts = new Map();
     items.forEach((item) => {

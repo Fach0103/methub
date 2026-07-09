@@ -1,5 +1,6 @@
 /**
  * <loading-state message="..."></loading-state>
+ * Usa la barra de progreso "marquee" (indeterminada) nativa de 7.css.
  */
 class LoadingState extends HTMLElement {
   static get observedAttributes() {
@@ -22,15 +23,16 @@ class LoadingState extends HTMLElement {
     wrap.setAttribute('role', 'status');
     wrap.setAttribute('aria-live', 'polite');
 
-    const spinner = document.createElement('div');
-    spinner.className = 'state__spinner';
-    spinner.setAttribute('aria-hidden', 'true');
+    const bar = document.createElement('div');
+    bar.setAttribute('role', 'progressbar');
+    bar.className = 'marquee';
+    wrap.appendChild(bar);
 
     const text = document.createElement('p');
     text.className = 'state__text';
     text.textContent = message;
+    wrap.appendChild(text);
 
-    wrap.append(spinner, text);
     this.appendChild(wrap);
   }
 }

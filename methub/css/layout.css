@@ -1,5 +1,43 @@
+/**
+ * layout.css — El "escritorio" (wallpaper Aero) y el tamaño/posición de
+ * la ventana única que contiene toda la SPA.
+ */
+.win7-desktop {
+  min-height: 100vh;
+  padding-bottom: var(--taskbar-height);
+  background:
+    radial-gradient(ellipse at top, #bcdcf4 0%, #6ea1d8 45%, #2f5f9e 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.win7-window {
+  width: min(1180px, 96vw);
+  margin: 28px 0 20px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - var(--taskbar-height) - 48px);
+  transition: max-height 0.2s ease, opacity 0.15s ease;
+}
+
+.win7-window-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 320px;
+}
+
+.win7-window.is-minimized .win7-window-body,
+.win7-window.is-minimized .status-bar {
+  display: none;
+}
+
+.win7-window.is-maximized {
+  width: 100vw;
+  max-height: calc(100vh - var(--taskbar-height));
+  margin: 0;
+}
+
 .app-main {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 24px 96px;
+  min-height: 100%;
 }

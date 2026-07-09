@@ -1,21 +1,11 @@
+/**
+ * tokens.css — Solo las variables que NECESITAMOS además de las que ya
+ * trae 7.css (--w7-w-bg, etc.). No redefinimos tipografías ni colores de
+ * controles: eso lo gobierna 7.css para mantener la fidelidad visual.
+ */
 :root {
-  --color-bg: #F3EFE6;
-  --color-surface: #FFFFFF;
-  --color-ink: #211D17;
-  --color-ink-soft: #625A4C;
-  --color-line: #DCD2BC;
-  --color-wall: #33413A;
-  --color-accent: #93712E;
-  --color-accent-deep: #6B5220;
-  --color-accent-on-wall: #D9C89A;
-  --color-error: #8C3B2E;
-  --color-error-bg: #F6E7E2;
-
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
-
-  --max-width: 1180px;
-  --radius: 3px;
-  --shadow-card: 0 1px 2px rgba(33, 29, 23, 0.06), 0 8px 20px -12px rgba(33, 29, 23, 0.18);
+  --taskbar-height: 40px;
+  --accent-glow: #6ea1d8;
+  --icon-selected-bg: rgba(120, 172, 232, 0.35);
+  --icon-selected-border: #3d6fb4;
 }

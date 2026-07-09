@@ -1,8 +1,11 @@
 /**
  * CompareView — V-06 Comparador (#compare). Sección 4.6.
- * Dos paneles independientes con buscador interno (debounce 400ms).
- * Cada panel guarda su propio "token" de búsqueda para descartar
- * respuestas obsoletas (si el usuario escribe rápido, solo cuenta la última).
+ * Reskin Windows 7: cada panel es una ventana independiente ("Obra A" /
+ * "Obra B"), los resultados de búsqueda usan un ListBox nativo de 7.css,
+ * y la tabla comparativa usa la clase `.highlighted` de 7.css para las
+ * filas que difieren (coincide exactamente con lo que ya necesitábamos).
+ * La lógica (debounce, token de búsqueda, restricción de duplicados) es
+ * idéntica a la versión anterior.
  */
 class CompareView extends View {
   render(_params, query) {
@@ -15,7 +18,7 @@ class CompareView extends View {
     layout.className = 'compare-layout';
 
     const header = document.createElement('div');
-    header.className = 'compare-header';
+    header.className = 'group';
     const h1 = document.createElement('h1');
     h1.textContent = 'Comparador de obras';
     const lead = document.createElement('p');
@@ -25,45 +28,70 @@ class CompareView extends View {
 
     const panelsRow = document.createElement('div');
     panelsRow.className = 'compare-panels';
-    panelsRow.appendChild(this._buildPanel(this.panels.A));
-    panelsRow.appendChild(this._buildPanel(this.panels.B));
+    panelsRow.appendChild(this._buildPanelWindow(this.panels.A));
+    panelsRow.appendChild(this._buildPanelWindow(this.panels.B));
     layout.appendChild(panelsRow);
 
     this.tableSection = document.createElement('section');
-    this.tableSection.className = 'compare-table-section';
     layout.appendChild(this.tableSection);
 
     this.container.appendChild(layout);
 
-    // Entrada desde #detail: ?a=objectID preselecciona el panel A (4.6.7)
     const preselectId = query.get('a');
     if (preselectId) this._preselectFromId('A', preselectId);
   }
 
   _createPanelState(side) {
-    return { side, obra: null, searchToken: 0, rootEl: null };
+    return { side, obra: null, searchToken: 0, windowEl: null, bodyEl: null };
   }
 
-  // --- Construcción de cada panel ---
+  // --- Cada panel es su propia "ventana" ---
 
-  _buildPanel(panelState) {
-    const panel = document.createElement('div');
-    panel.className = 'compare-panel';
-    panelState.rootEl = panel;
-    this._renderPanelContent(panelState);
-    return panel;
+  _buildPanelWindow(panelState) {
+    const win = document.createElement('div');
+    win.className = 'window active compare-panel';
+
+    const titleBar = document.createElement('div');
+    titleBar.className = 'title-bar';
+    const titleText = document.createElement('div');
+    titleText.className = 'title-bar-text';
+    titleText.textContent = `Obra ${panelState.side}`;
+    titleBar.appendChild(titleText);
+
+    const controls = document.createElement('div');
+    controls.className = 'title-bar-controls';
+    const closeBtn = document.createElement('button');
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.title = 'Quitar selección';
+    closeBtn.disabled = !panelState.obra;
+    closeBtn.addEventListener('click', () => {
+      if (!panelState.obra) return;
+      panelState.obra = null;
+      this._renderPanelBody(panelState);
+      this._updateComparisonTable();
+    });
+    controls.appendChild(closeBtn);
+    titleBar.appendChild(controls);
+    win.appendChild(titleBar);
+
+    const body = document.createElement('div');
+    body.className = 'window-body has-space';
+    win.appendChild(body);
+
+    panelState.windowEl = win;
+    panelState.bodyEl = body;
+    panelState.closeBtn = closeBtn;
+
+    this._renderPanelBody(panelState);
+    return win;
   }
 
-  _renderPanelContent(panelState) {
-    const panel = panelState.rootEl;
-    panel.innerHTML = '';
-
-    const label = document.createElement('p');
-    label.className = 'compare-panel__label';
-    label.textContent = `Obra ${panelState.side}`;
-    panel.appendChild(label);
-
-    panel.appendChild(panelState.obra ? this._buildSelectedCard(panelState) : this._buildSearchUI(panelState));
+  _renderPanelBody(panelState) {
+    panelState.bodyEl.innerHTML = '';
+    panelState.closeBtn.disabled = !panelState.obra;
+    panelState.bodyEl.appendChild(
+      panelState.obra ? this._buildSelectedCard(panelState) : this._buildSearchUI(panelState)
+    );
   }
 
   _buildSelectedCard(panelState) {
@@ -84,7 +112,8 @@ class CompareView extends View {
     }
     wrap.appendChild(imgWrap);
 
-    const title = document.createElement('h3');
+    const title = document.createElement('p');
+    title.className = 'compare-selected__title';
     title.textContent = obra.title || 'Sin título';
     wrap.appendChild(title);
 
@@ -93,17 +122,6 @@ class CompareView extends View {
     artist.textContent = obra.artistDisplayName || 'Artista desconocido';
     wrap.appendChild(artist);
 
-    const changeBtn = document.createElement('button');
-    changeBtn.type = 'button';
-    changeBtn.className = 'btn btn--ghost-neutral';
-    changeBtn.textContent = 'Cambiar';
-    changeBtn.addEventListener('click', () => {
-      panelState.obra = null;
-      this._renderPanelContent(panelState);
-      this._updateComparisonTable();
-    });
-    wrap.appendChild(changeBtn);
-
     return wrap;
   }
 
@@ -111,55 +129,71 @@ class CompareView extends View {
     const wrap = document.createElement('div');
     wrap.className = 'compare-search';
 
+    const searchBox = document.createElement('div');
+    searchBox.className = 'searchbox';
     const input = document.createElement('input');
     input.type = 'search';
     input.placeholder = 'Busca una obra por nombre, artista, tema…';
-    wrap.appendChild(input);
+    const searchIconBtn = document.createElement('button');
+    searchIconBtn.setAttribute('aria-label', 'search');
+    searchBox.append(input, searchIconBtn);
+    wrap.appendChild(searchBox);
 
-    const resultsEl = document.createElement('div');
-    resultsEl.className = 'compare-results';
-    resultsEl.appendChild(this._buildNote('Busca y elige una obra para comparar.'));
+    const resultsEl = document.createElement('ul');
+    resultsEl.setAttribute('role', 'listbox');
+    resultsEl.className = 'has-shadow has-hover compare-results';
     wrap.appendChild(resultsEl);
+    this._setListboxNote(resultsEl, 'Busca y elige una obra para comparar.');
+
+    const triggerSearch = () => {
+      const term = input.value.trim();
+      if (term === '') {
+        this._setListboxNote(resultsEl, 'Busca y elige una obra para comparar.');
+        return;
+      }
+      this._runPanelSearch(panelState, term, resultsEl);
+    };
 
     let debounceId;
     input.addEventListener('input', () => {
       clearTimeout(debounceId);
-      const term = input.value.trim();
-      if (term === '') {
-        resultsEl.innerHTML = '';
-        resultsEl.appendChild(this._buildNote('Busca y elige una obra para comparar.'));
-        return;
-      }
-      debounceId = setTimeout(() => this._runPanelSearch(panelState, term, resultsEl), 400);
+      debounceId = setTimeout(triggerSearch, 400);
     });
+    searchIconBtn.addEventListener('click', triggerSearch);
 
     return wrap;
   }
 
-  _buildNote(text) {
-    const p = document.createElement('p');
-    p.className = 'note';
-    p.textContent = text;
-    return p;
+  _setListboxNote(resultsEl, text) {
+    resultsEl.innerHTML = '';
+    const li = document.createElement('li');
+    li.className = 'note';
+    li.textContent = text;
+    resultsEl.appendChild(li);
   }
 
   // --- Búsqueda interna por panel (4.6.2) ---
 
   async _runPanelSearch(panelState, term, resultsEl) {
-    const token = ++panelState.searchToken; // invalida cualquier búsqueda anterior de este panel
+    const token = ++panelState.searchToken;
     resultsEl.innerHTML = '';
-    this.showLoading(resultsEl, 'Buscando…');
+    const loadingLi = document.createElement('li');
+    loadingLi.appendChild((() => {
+      const el = document.createElement('loading-state');
+      el.setAttribute('message', 'Buscando…');
+      return el;
+    })());
+    resultsEl.appendChild(loadingLi);
 
     try {
       const { objectIDs } = await this.services.metService.search(
         { q: term, hasImages: true },
         { signal: this.signal }
       );
-      if (token !== panelState.searchToken) return; // respuesta obsoleta: se descarta
+      if (token !== panelState.searchToken) return;
 
       if (objectIDs.length === 0) {
-        resultsEl.innerHTML = '';
-        resultsEl.appendChild(this._buildNote('No se encontraron obras con ese término.'));
+        this._setListboxNote(resultsEl, 'No se encontraron obras con ese término.');
         return;
       }
 
@@ -170,61 +204,63 @@ class CompareView extends View {
 
       resultsEl.innerHTML = '';
       if (resolved.length === 0) {
-        resultsEl.appendChild(this._buildNote('No se pudieron cargar los resultados.'));
+        this._setListboxNote(resultsEl, 'No se pudieron cargar los resultados.');
         return;
       }
-      resolved.forEach((obra) => resultsEl.appendChild(this._buildMiniCard(obra, panelState)));
+      resolved.forEach((obra) => resultsEl.appendChild(this._buildResultOption(obra, panelState)));
     } catch (err) {
       if (this.isCancelled(err) || token !== panelState.searchToken) return;
       resultsEl.innerHTML = '';
-      this.showError(resultsEl, 'No se pudo completar la búsqueda.', () =>
+      const errLi = document.createElement('li');
+      this.showError(errLi, 'No se pudo completar la búsqueda.', () =>
         this._runPanelSearch(panelState, term, resultsEl)
       );
+      resultsEl.appendChild(errLi);
     }
   }
 
-  _buildMiniCard(obra, panelState) {
+  _buildResultOption(obra, panelState) {
     const otherSide = panelState.side === 'A' ? 'B' : 'A';
     const otherObra = this.panels[otherSide].obra;
     const alreadyTaken = Boolean(otherObra && otherObra.objectID === obra.objectID);
 
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'compare-minicard';
-    card.disabled = alreadyTaken;
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    li.className = 'compare-result-option';
+    if (alreadyTaken) li.setAttribute('aria-disabled', 'true');
 
-    const imgWrap = document.createElement('div');
-    imgWrap.className = 'compare-minicard__image';
+    const thumb = document.createElement('span');
+    thumb.className = 'compare-result-option__thumb';
     if (obra.primaryImageSmall) {
       const img = document.createElement('img');
       img.src = obra.primaryImageSmall;
       img.alt = obra.title || 'Obra sin título';
-      imgWrap.appendChild(img);
+      thumb.appendChild(img);
     }
-    card.appendChild(imgWrap);
+    li.appendChild(thumb);
 
-    const info = document.createElement('div');
-    info.className = 'compare-minicard__info';
+    const info = document.createElement('span');
+    info.className = 'compare-result-option__info';
     const title = document.createElement('span');
-    title.className = 'compare-minicard__title';
+    title.className = 'compare-result-option__title';
     title.textContent = obra.title || 'Sin título';
     const artist = document.createElement('span');
-    artist.className = 'compare-minicard__artist';
+    artist.className = 'compare-result-option__artist';
     artist.textContent = alreadyTaken
       ? `Ya está seleccionada en el panel ${otherSide}`
       : obra.artistDisplayName || 'Artista desconocido';
     info.append(title, artist);
-    card.appendChild(info);
+    li.appendChild(info);
 
     if (!alreadyTaken) {
-      card.addEventListener('click', () => {
+      li.addEventListener('click', () => {
         panelState.obra = obra;
-        this._renderPanelContent(panelState);
+        this._renderPanelBody(panelState);
         this._updateComparisonTable();
       });
     }
 
-    return card;
+    return li;
   }
 
   async _preselectFromId(side, id) {
@@ -233,21 +269,20 @@ class CompareView extends View {
       const obra = await this.services.metService.getObject(id, { signal: this.signal });
       if (obra && obra.objectID) {
         panelState.obra = obra;
-        this._renderPanelContent(panelState);
+        this._renderPanelBody(panelState);
         this._updateComparisonTable();
       }
     } catch (err) {
       if (this.isCancelled(err)) return;
-      // Falla silenciosa: el panel simplemente queda en su buscador inicial.
     }
   }
 
-  // --- Tabla comparativa (4.6.5) ---
+  // --- Tabla comparativa (4.6.5) — usa la clase .highlighted nativa de 7.css ---
 
   _updateComparisonTable() {
     this.tableSection.innerHTML = '';
     const { A, B } = this.panels;
-    if (!A.obra || !B.obra) return; // solo se muestra con dos obras seleccionadas (4.6.6)
+    if (!A.obra || !B.obra) return;
 
     const rows = [
       ['Artista', A.obra.artistDisplayName || 'Artista desconocido', B.obra.artistDisplayName || 'Artista desconocido'],
@@ -261,7 +296,7 @@ class CompareView extends View {
     ];
 
     const table = document.createElement('table');
-    table.className = 'compare-table';
+    table.className = 'has-shadow';
 
     const thead = document.createElement('thead');
     const headRow = document.createElement('tr');
@@ -276,10 +311,11 @@ class CompareView extends View {
     const tbody = document.createElement('tbody');
     rows.forEach(([label, valueA, valueB]) => {
       const tr = document.createElement('tr');
-      if (valueA !== valueB) tr.classList.add('compare-table__row--diff');
+      if (valueA !== valueB) tr.classList.add('highlighted');
 
       const th = document.createElement('th');
       th.textContent = label;
+      th.style.textAlign = 'left';
       const tdA = document.createElement('td');
       tdA.textContent = valueA;
       const tdB = document.createElement('td');

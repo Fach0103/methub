@@ -1,6 +1,7 @@
 /**
  * <error-state message="..." retry></error-state>
- * Con atributo `retry`, muestra un botón que emite evento 'retry' (bubbles).
+ * Con atributo `retry`, muestra un botón nativo (7.css lo estiliza solo)
+ * que emite un evento 'retry' (bubbles).
  */
 class ErrorState extends HTMLElement {
   connectedCallback() {
@@ -30,7 +31,6 @@ class ErrorState extends HTMLElement {
     if (showRetry) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'btn btn--ghost';
       button.textContent = 'Reintentar';
       button.addEventListener('click', () => {
         this.dispatchEvent(new CustomEvent('retry', { bubbles: true }));
