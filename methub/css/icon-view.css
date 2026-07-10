@@ -1,8 +1,4 @@
-/**
- * icon-view.css — Componente compartido: grilla de "íconos" estilo
- * Explorador de Windows (miniatura + etiqueta debajo). Se usa para las
- * galerías de obras (Home, Explore, Artist) y para los departamentos.
- */
+
 .icon-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

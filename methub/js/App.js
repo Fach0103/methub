@@ -1,10 +1,4 @@
-/**
- * App — construye las dependencias UNA vez (ApiClient, MetService) y se
- * las inyecta a cada View. Controla el ciclo de vida: al cambiar de ruta,
- * desmonta la vista anterior (cancela sus peticiones pendientes) antes de
- * montar la nueva. También mantiene sincronizada la barra de título de la
- * "ventana" Windows 7 con la vista activa.
- */
+
 class App {
   static ROUTE_LABELS = {
     home: 'Página Principal',
@@ -71,7 +65,7 @@ class App {
     titleEl.textContent = `MetHub — ${label}`;
   }
 
-  /** Los controles de la barra de título son decorativos + un par de gestos útiles. */
+ 
   _wireWindowControls() {
     const win = document.getElementById('win7-window');
     const closeBtn = document.getElementById('win7-btn-close');
@@ -112,5 +106,5 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
   const app = new App();
   app.start();
-  window.methubApp = app; // útil para depurar desde la consola del navegador
+  window.methubApp = app; 
 });

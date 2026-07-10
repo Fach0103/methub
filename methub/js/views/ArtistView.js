@@ -1,8 +1,4 @@
-/**
- * ArtistView — V-05 Obras del Artista (#artist/:name). Sección 4.5.
- * Reutiliza la vista de íconos (HomeView.buildIconTile) y el patrón de
- * paginación en status-bar de ExploreView.
- */
+
 class ArtistView extends View {
   constructor(deps) {
     super(deps);

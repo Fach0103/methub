@@ -1,12 +1,4 @@
-/**
- * CompareView — V-06 Comparador (#compare). Sección 4.6.
- * Reskin Windows 7: cada panel es una ventana independiente ("Obra A" /
- * "Obra B"), los resultados de búsqueda usan un ListBox nativo de 7.css,
- * y la tabla comparativa usa la clase `.highlighted` de 7.css para las
- * filas que difieren (coincide exactamente con lo que ya necesitábamos).
- * La lógica (debounce, token de búsqueda, restricción de duplicados) es
- * idéntica a la versión anterior.
- */
+
 class CompareView extends View {
   render(_params, query) {
     this.panels = {

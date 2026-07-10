@@ -1,7 +1,4 @@
-/**
- * base.css — Reset mínimo. Deliberadamente NO tocamos font-family,
- * colores de texto ni de botones: eso es responsabilidad de 7.css.
- */
+
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 img { max-width: 100%; display: block; }

@@ -1,8 +1,4 @@
-/**
- * DepartmentsView — V-04 Departamentos (#departments). Sección 4.4.
- * Reskin Windows 7: cada departamento es una "carpeta" en la vista de
- * íconos, tal como aparecerían unidades/carpetas en el Explorador.
- */
+
 class DepartmentsView extends View {
   static PALETTE = ['#3a6ea5', '#2c6e1f', '#a5762c', '#6a4a9e', '#a5382c', '#2c8a8a'];
 

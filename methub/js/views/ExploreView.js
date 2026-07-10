@@ -1,10 +1,4 @@
-/**
- * ExploreView — V-02 Explorar (#explore). Sección 4.2.
- * Reskin Windows 7: filtros y agregados como GroupBox (fieldset), galería
- * como vista de íconos, paginación como mini barra de estado.
- * La lógica (búsqueda, paginación, agregados, preservación de estado al
- * volver) es idéntica a la versión anterior — solo cambia el marcado/CSS.
- */
+
 class ExploreView extends View {
   constructor(deps) {
     super(deps);
@@ -358,7 +352,6 @@ class ExploreView extends View {
     this.paginationEl.append(prevField, infoField, nextField);
   }
 
-  // --- Panel de agregados en vivo (4.2.2) ---
 
   _renderAggregates(resolvedObras, total) {
     this.aggregatesFieldset.innerHTML = '';

@@ -8,7 +8,7 @@ Metropolitan Museum of Art para explorar su colección de más de 470.000 obras.
 
 ## Integrante
 
-- **[Tu nombre completo]** — desarrollo completo del proyecto (arquitectura,
+- Abraham Chourio — desarrollo completo del proyecto (arquitectura,
   las seis vistas, componentes globales y estilos).
 
 > Este proyecto se desarrolló de forma individual, no en pareja.

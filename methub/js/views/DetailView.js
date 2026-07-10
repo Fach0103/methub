@@ -1,9 +1,4 @@
-/**
- * DetailView — V-03 Detalle de Obra (#detail/:id). Sección 4.3.
- * Reskin Windows 7: la ficha se muestra dentro de una ventana anidada con
- * pestañas ("General" / "Etiquetas"), al estilo de un diálogo de
- * Propiedades de archivo.
- */
+
 class DetailView extends View {
   render(params) {
     this.showLoading(this.container, 'Cargando obra…');

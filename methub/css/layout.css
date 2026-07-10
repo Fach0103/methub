@@ -1,7 +1,4 @@
-/**
- * layout.css — El "escritorio" (wallpaper Aero) y el tamaño/posición de
- * la ventana única que contiene toda la SPA.
- */
+
 .win7-desktop {
   min-height: 100vh;
   padding-bottom: var(--taskbar-height);

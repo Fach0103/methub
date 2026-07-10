@@ -6,10 +6,10 @@
   <title>MetHub — Explorador de la colección del Met</title>
   <meta name="description" content="Explora la colección abierta del Metropolitan Museum of Art." />
 
-  <!-- 7.css: recreación fiel de la UI de Windows 7. Ver https://khang-nd.github.io/7.css/ -->
+  
   <link rel="stylesheet" href="https://unpkg.com/7.css" />
 
-  <!-- Nuestros estilos: complementan a 7.css, nunca pelean con sus controles nativos -->
+ 
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/layout.css" />
@@ -26,8 +26,7 @@
 </head>
 <body class="win7-desktop">
 
-  <!-- Ventana única: todo el contenido de la SPA vive aquí. La barra de título
-       y la barra de estado son persistentes; solo #app-main cambia por ruta. -->
+  
   <div class="window glass active win7-window" id="win7-window">
     <div class="title-bar" id="win7-titlebar">
       <div class="title-bar-text" id="win7-title-text">MetHub — Página Principal</div>
@@ -40,12 +39,11 @@
 
     <div class="window-body has-space win7-window-body" id="win7-window-body">
       <main id="app-main" class="app-main">
-        <!-- App reemplaza este contenido dinámicamente según la ruta -->
+       
       </main>
     </div>
 
-    <!-- Barra de estado: cumple el rol del footer (créditos + fuente de datos),
-         siempre visible sin importar la vista (sección 3.2 del documento). -->
+  
     <div class="status-bar">
       <p class="status-bar-field">Hecho por [Tu nombre] · 2026</p>
       <p class="status-bar-field">Datos: Open Access API del Metropolitan Museum of Art</p>
@@ -55,18 +53,18 @@
 
   <nav-bar></nav-bar>
 
-  <!-- Core: orden estricto, cada clase depende de la anterior -->
+  
   <script src="js/core/ApiClient.js"></script>
   <script src="js/core/MetService.js"></script>
   <script src="js/core/Router.js"></script>
   <script src="js/core/View.js"></script>
 
-  <!-- Componentes (Custom Elements), independientes entre sí -->
+  
   <script src="js/components/NavBar.js"></script>
   <script src="js/components/LoadingState.js"></script>
   <script src="js/components/ErrorState.js"></script>
 
-  <!-- Vistas: todas extienden View, deben cargarse después de core/View.js -->
+  
   <script src="js/views/HomeView.js"></script>
   <script src="js/views/ExploreView.js"></script>
   <script src="js/views/DetailView.js"></script>
@@ -74,7 +72,7 @@
   <script src="js/views/ArtistView.js"></script>
   <script src="js/views/CompareView.js"></script>
 
-  <!-- Bootstrap: siempre al final -->
+
   <script src="js/App.js"></script>
 </body>
 </html>

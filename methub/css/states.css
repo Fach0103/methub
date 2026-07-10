@@ -1,7 +1,4 @@
-/**
- * states.css — Loading (barra "marquee" de 7.css) y error (caja simple,
- * botón nativo ya estilizado por 7.css).
- */
+
 .state {
   display: flex;
   flex-direction: column;

@@ -1,8 +1,4 @@
-/**
- * Router de hash con soporte de :params de ruta y query params
- * (ej. #explore?departmentId=11&page=2). Cada handler recibe (params, query)
- * donde query es un URLSearchParams.
- */
+
 class Router {
   constructor() {
     this.routes = [];

@@ -1,8 +1,4 @@
-/**
- * tokens.css — Solo las variables que NECESITAMOS además de las que ya
- * trae 7.css (--w7-w-bg, etc.). No redefinimos tipografías ni colores de
- * controles: eso lo gobierna 7.css para mantener la fidelidad visual.
- */
+
 :root {
   --taskbar-height: 40px;
   --accent-glow: #6ea1d8;

@@ -1,6 +1,4 @@
-/**
- * stats.css — Estadísticas de #home, dentro de un fieldset (GroupBox de 7.css).
- */
+
 .stats-groupbox {
   display: flex;
   gap: 24px;

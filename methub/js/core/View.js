@@ -1,13 +1,8 @@
-/**
- * View — clase base abstracta para todas las vistas.
- * Contrato: cada subclase implementa render(params, query).
- * Ciclo de vida: App llama mount() al entrar a la ruta y unmount() al
- * salir — así cualquier fetch pendiente se cancela solo (ver ApiClient).
- */
+
 class View {
   constructor({ container, services, router }) {
     this.container = container;
-    this.services = services; // { metService }
+    this.services = services; 
     this.router = router;
     this.abortController = null;
     this.params = {};
@@ -26,7 +21,7 @@ class View {
     if (this.abortController) this.abortController.abort();
   }
 
-  // Debe sobreescribirse en cada subclase.
+
   render(_params, _query) {
     throw new Error(`${this.constructor.name} no implementó render()`);
   }
@@ -35,7 +30,7 @@ class View {
     return this.abortController ? this.abortController.signal : undefined;
   }
 
-  // --- Helpers compartidos por todas las vistas ---
+
 
   showLoading(target, message) {
     target.innerHTML = '';
@@ -53,7 +48,7 @@ class View {
     target.appendChild(el);
   }
 
-  // Ignora silenciosamente errores causados por unmount(); re-lanza el resto.
+
   isCancelled(err) {
     return err && err.name === 'CancelledError';
   }

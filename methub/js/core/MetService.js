@@ -1,8 +1,4 @@
-/**
- * MetService — todo lo que la app sabe sobre la API del Met Museum.
- * Documentación oficial: https://metmuseum.github.io/
- * Recibe un ApiClient inyectado por constructor (no lo instancia).
- */
+
 class MetService {
   constructor(apiClient) {
     this.api = apiClient;
@@ -31,10 +27,6 @@ class MetService {
     return this.api.get(`/objects/${id}`, opts);
   }
 
-  /**
-   * Patrón "búsqueda con resolución": resuelve varios IDs EN PARALELO
-   * con Promise.allSettled (RNF-04). Los rechazos no rompen la vista.
-   */
   async resolveIds(ids, opts = {}) {
     const settled = await Promise.allSettled(ids.map((id) => this.getObject(id, opts)));
     const resolved = [];

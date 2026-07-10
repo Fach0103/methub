@@ -1,7 +1,4 @@
-/**
- * <loading-state message="..."></loading-state>
- * Usa la barra de progreso "marquee" (indeterminada) nativa de 7.css.
- */
+
 class LoadingState extends HTMLElement {
   static get observedAttributes() {
     return ['message'];

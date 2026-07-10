@@ -1,8 +1,4 @@
-/**
- * <nav-bar> — Ahora renderiza como la taskbar de Windows 7: orbe de inicio
- * a la izquierda ("MetHub") y botones anclados para las secciones
- * principales. Se auto-actualiza al navegar (sección 3.1 del documento).
- */
+
 class NavBar extends HTMLElement {
   connectedCallback() {
     this.render();

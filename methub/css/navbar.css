@@ -1,8 +1,4 @@
-/**
- * navbar.css — Estilos de la taskbar (antes navbar). El elemento
- * <nav-bar> se posiciona fijo abajo, imitando la barra de tareas de
- * Windows 7.
- */
+
 nav-bar {
   display: block;
   position: fixed;

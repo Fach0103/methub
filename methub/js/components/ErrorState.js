@@ -1,8 +1,4 @@
-/**
- * <error-state message="..." retry></error-state>
- * Con atributo `retry`, muestra un botón nativo (7.css lo estiliza solo)
- * que emite un evento 'retry' (bubbles).
- */
+
 class ErrorState extends HTMLElement {
   connectedCallback() {
     this.render();
